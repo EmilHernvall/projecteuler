@@ -1,21 +1,27 @@
-n = 600851475143
+factorize :: Integer -> [Integer]
+factorize n =
+    let 
+        findfactor n m b
+            | m <= b && n `mod` m == 0 = [m] ++ (findfactor n (m+1) b) ++ [n `div` m]
+            | m <= b = findfactor n (m+1) b
+            | otherwise = []
+        root = ceiling (sqrt (fromIntegral n))
+    in findfactor n 2 root
 
-factor :: Integer -> [Integer]
-factor x = let searchUntil = (truncate (sqrt (fromIntegral x)))
-	in filter (\y -> x `mod` y == 0) [2..searchUntil]
+primefactorize :: Integer -> [Integer]
+primefactorize n =
+    let 
+        factors = factorize n
+        isdividable l n = foldr (&&) True [ n `mod` x /= 0 | x <- l, x /= n ]
+    in [ x | x <- factors, isdividable factors x ]
 
-primefactor2 :: [Integer] -> [Integer] -> [Integer]
-primefactor2 x (y:ys) = let rem = (filter (\s -> y `mod` s == 0) x)
-                            next = (primefactor2 (y:x) ys)
-	in if (length rem) == 0 then [y] ++ next
-	else next
-primefactor2 x [] = []
-
-primefactor :: Integer -> [Integer]
-primefactor n = primefactor2 [] (factor n)
-
-factors = primefactor n
-maxfactor = last factors
+findmax :: [Integer] -> Integer
+findmax x = 
+    let 
+        maxfilter a b 
+            | a > b = a
+            | otherwise = b
+    in foldr maxfilter 0 x
 
 main = do
-	print maxfactor
+    putStrLn (show (findmax (primefactorize 600851475143)))

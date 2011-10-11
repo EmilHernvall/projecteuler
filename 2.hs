@@ -1,14 +1,13 @@
-c = ((sqrt(5)+1)/2)^3
+fib n = fibhelper 1 1 n
+    where fibhelper a b n
+              | b < n =
+                  let c = a + b
+                  in [c] ++ (fibhelper b c (n-1))
+              | otherwise = []
 
-evenfibonacci :: [Integer] -> Integer -> [Integer]
-evenfibonacci (n:ns) m = let next = round (c*(fromIntegral n))
-	in if next < m then evenfibonacci (next:n:ns) m
-	else n:ns
-evenfibonacci [] m = evenfibonacci [2] m
+evenfibsum n = sum (filter even (fib n))
 
-total = evenfibonacci [] 4000000
+maxfib = 4000000
 
 main = do
-	print c
-	print total
-	print (sum total)
+	putStrLn (show (evenfibsum maxfib))

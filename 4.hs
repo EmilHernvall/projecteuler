@@ -1,19 +1,30 @@
-digitcount :: Integer -> Integer
-digitcount n = ceiling (log (fromIntegral n)/(log 10))
+factorize :: Int -> [Int]
+factorize n =
+    let
+        findfactor n m b
+            | m <= b && n `mod` m == 0 = [m] ++ (findfactor n (m+1) b) ++ [n `div` m]
+            | m <= b = findfactor n (m+1) b
+            | otherwise = []
+        root = ceiling (sqrt (fromIntegral n))
+    in findfactor n 2 root
 
-palindromize2 :: Integer -> Integer -> Integer
-palindromize2 n m | m > 0 = let a = m `div` 10
-                                b = m - a * 10
-                            in palindromize2 (n*10+b) a
-                  | otherwise = n
+palindrome :: Int -> Int
+palindrome n = let
+    palindrome' n m c
+        | n > 0 = palindrome' a b (c+1)
+        | otherwise = (m,c)
+        where
+            a = n `div` 10
+            b = 10*m + (n `mod` 10)
+    revnum = palindrome' n 0 0
+    in n * 10^(snd revnum) + (fst revnum)
 
-palindromize :: Integer -> Integer
-palindromize n = palindromize2 n n
-
-palindromseries :: Integer -> Integer -> [Integer]
-palindromseries n m = map palindromize [n..m]
-
-test = palindromseries 100 999
+largefactors n = 
+    let
+        factors = factorize n
+        filtered = filter (\x -> x >= 100 && x <= 999) factors
+        filtered2 = filter (\x -> (n `div` x) >= 100 && (n `div` x) <= 999) filtered
+    in (n, filtered2)
 
 main = do
-	print test
+    print $ fst . last $ filter (\x -> (snd x) /= []) $ map (largefactors . palindrome) [100..999]
