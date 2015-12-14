@@ -1,58 +1,43 @@
-def mc(col, row):
-	return ((col & 0xFFFF) << 16) | (row & 0xFFFF)
+def find_min(matrix, x0, y0, path):
+    if cache.has_key((x0, y0)): return cache[(x0,y0)]
+    if (x0, y0) in path: return 0xFFFFFF
+    if y0 == len(matrix): return 0xFFFFFFFF
+    if y0 < 0: return 0xFFFFFFFF
+    if x0 == 0: return matrix[y0][x0]
 
-def recurse(matrix, col, row, visited):
-	if col == 0:
-		return matrix[col][row]
+    path.append((x0, y0))
 
-	coord = mc(col, row)
-	visited.append(coord)
+    res = matrix[y0][x0] + min(find_min(matrix, x0-1, y0, path),
+                               find_min(matrix, x0, y0-1, path),
+                               find_min(matrix, x0, y0+1, path))
 
-#	print str(col) + " " + str(row)
+    path.pop()
 
-	v = matrix[col][row]
-	m = ()
-	go = -1
-	if row > 0:
-		if matrix[col][row-1] < m and mc(col, row-1) not in visited:
-			m = matrix[col][row-1]
-			go = 1
-	if row < len(matrix) - 1:
-		if matrix[col][row+1] < m and mc(col,row+1) not in visited:
-			m = matrix[col][row+1]
-			go = 2
-	if matrix[col-1][row] < m and mc(col-1,row) not in visited:
-		m = matrix[col-1][row]
-		go = 3
+    return res
 
-	if go == 1:
-		v += recurse(matrix, col, row-1, visited)
-	elif go == 2:
-		v += recurse(matrix, col, row+1, visited)
-	else:
-		v += recurse(matrix, col-1, row, visited)
-
-	return v
-
-# load
-f = open("81-2.txt", "r")
 matrix = []
-while True:
-	l = f.readline().strip()
-	if l == "":
-		break
-	row = map(lambda x: int(x), l.split(","))
-	for i, e in enumerate(row):
-		if len(matrix) <= i:
-			matrix.append([e])
-		else:
-			matrix[i].append(e)
+with open('p082_matrix.txt', 'r') as fh:
+    for l in fh:
+        l = l.strip()
+        matrix.append([int(x) for x in l.split(",")])
 
-dim = len(matrix)
-minV = ()
-for i, cell in enumerate(matrix[-1]):
-	res = recurse(matrix, dim-1, i, [])
-	print cell
-	print "\t" + str(res)
-	minV = min(res, minV)
-print "min: " + str(minV)
+cache = {}
+for x in xrange(0, len(matrix)):
+    for y in xrange(0, len(matrix)):
+        res = find_min(matrix, x, y, [])
+        cache[(x,y)] = res
+
+min_cost = []
+for y in xrange(0, len(matrix)):
+    row = []
+    for x in xrange(0, len(matrix)):
+        row.append(cache[(x,y)])
+    min_cost.append(row)
+
+winner = 0xFFFFFFFF
+for row in min_cost:
+    print row
+    winner = min(winner, row[-1])
+
+print winner
+
