@@ -1,49 +1,19 @@
-def gcd(a, b):
-	while b != 0:
-		t = b
-		b = a % b
-		a = t
-	return a
+# (a+b)^2 + c^2
+# (a+c)^2 + b^2
+# (b+c)^2 + a^2
 
-def triplets(side):
-	m = 2
-	tc = 0
-	while True:
-		validCount = 0
-		for n in xrange(1, m+1):
-			if gcd(m, n) != 1:
-				continue
+from math import sqrt
 
-			a = m*m - n*n
-			b = 2*m*n
-			c = m*m + n*n
+M = 100
+total = 0
+for a in xrange(1, M+1):
+    for b in xrange(a, M+1):
+        for c in xrange(b, M+1):
+            d = min((a+b)**2 + c**2,
+                    (a+c)**2 + b**2,
+                    (b+c)**2 + a**2)
 
-			if a > side or b > side:
-				break
+            ds = int(sqrt(d))
+            if ds*ds == d: total += 1
 
-			yield (a,b,c)
-			tc += 1
-
-			for k in xrange(2, min(int(side/a), int(side/b))+1):
-				tc += 1
-				yield (k*a,k*b,k*c)
-
-			validCount += 1
-
-		if validCount == 0:
-			break
-
-		m += 1
-
-	return
-
-def problem86(side):
-	c = 0
-	for triplet in triplets(side):
-		#print triplet
-		c += triplet[0] - 1
-
-	print c
-
-if __name__ == "__main__":
-	problem86(100)
+print total
