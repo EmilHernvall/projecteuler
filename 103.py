@@ -1,7 +1,6 @@
 from itertools import permutations, combinations
 
 def is_special_sum_set(a):
-    pairs, eqtest = 0, 0
     for m1 in xrange(1, 1 << len(a)):
         b = [n for i,n in enumerate(a) if (m1 & (1 << i)) > 0]
         for m2 in xrange(1, 1 << len(a)):
